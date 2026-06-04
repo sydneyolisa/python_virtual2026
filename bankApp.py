@@ -3,6 +3,7 @@
 # bank application
 # account table - id, fullname, email, password, account_no, balance, created_at
 from random import choice, randint
+import re
 
 from pwinput import pwinput
 import bcrypt
@@ -32,6 +33,15 @@ class Config:
         values = (fullname, email, hashed, account_no)
         self.mycursor.execute(query, values)
         return "Registration Successful"
+
+    def validate_email(self):
+        email = input("email: ").strip().lower()
+        pattern = r"^[\w.-]+@[\w.-]+\.\w{2,}$"
+        if not re.match(pattern, email):
+            print("Invalid email format")
+            return self.validate_email()
+
+        return email
 
     def set_password(self):
         password1 = pwinput()
@@ -91,7 +101,11 @@ class BankApp(Config):
 
     def signup(self):
         fullname = input("Fullname: ").strip().title()
-        email = input("email: ").strip().lower()
+        if fullname.lower() == "back":
+            self.menu()
+            return
+
+        email = self.validate_email()
         password = self.set_password()
         response = self.register(fullname, email, password)
         print(response)
@@ -99,6 +113,9 @@ class BankApp(Config):
 
     def signin(self):
         email = input("email: ").strip().lower()
+        if email == "back":
+            self.menu()
+            return
         password = pwinput("Insert Password: ")
         user = self.login(email, password)
 
@@ -167,7 +184,7 @@ class BankApp(Config):
         self.mycursor.execute(query, values)
 
     def deposit(self):
-        amount = float(input("Amount: "))
+        amount = float(input("Amount: ").replace(",", ""))
         if amount < 0:
             print("Invalid amount")
         else:
@@ -193,7 +210,7 @@ class BankApp(Config):
         self.dashboard()
 
     def withdraw(self):
-        amount = float(input("Amount: "))
+        amount = float(input("Amount: ").replace(",", ""))
         if amount < 0:
             print("Invalid amount")
 
@@ -235,7 +252,7 @@ class BankApp(Config):
         self.dashboard()
 
     def bk_transfer(self):
-        amount = float(input("Amount: "))
+        amount = float(input("Amount: ").replace(",", ""))
         recipient_no = int(input("Recipient Account Number: "))
 
         if amount < 0:
@@ -290,7 +307,7 @@ class BankApp(Config):
         self.dashboard()
 
     def trans_history(self):
-        query = "SELECT * from transact_table WHERE account_no =%s"
+        query = "SELECT * FROM transact_table WHERE account_no = %s ORDER BY created_at DESC LIMIT 10"
         values = (self.current_user["account_no"],)
         self.mycursor.execute(query, values)
         user_history = self.mycursor.fetchall()
