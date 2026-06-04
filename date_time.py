@@ -1,4 +1,3 @@
-
 import datetime as dt
 
 
@@ -17,6 +16,7 @@ def Alarm_set():
 
         Alarm_on()
 
+
 def Alarm_on():
     print(f"""
         It's Time!!!
@@ -26,11 +26,11 @@ def Alarm_on():
         1. Snooze Alarm
         2. Stop Alarm
     """)
-    
+
     user = input("Input 1 or 2: ")
 
     if user == "1":
-        Snooze() 
+        Snooze()
 
     elif user == "2":
         print("Alarm stopped")
@@ -39,9 +39,10 @@ def Alarm_on():
     else:
         print("Invalid Input")
 
+
 def Snooze():
-    snooze_set = now.minute + dt.timedelta(minute= snooze_dur)
-    
+    snooze_set = now.minute + dt.timedelta(minute=snooze_dur)
+
     while True:
         now.minute == snooze_set.minute
 
